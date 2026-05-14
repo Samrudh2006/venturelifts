@@ -93,24 +93,48 @@
               <form id="loginForm" class="auth-form active">
                 <h2>Welcome back</h2>
                 <p class="form-note">Use your account email and password. Your role is detected automatically after login.</p>
-                <label>Email<input name="email" type="email" required autocomplete="email" placeholder="you@venturelift.local"></label>
-                <label>Password<input name="password" type="password" required autocomplete="current-password" placeholder="Enter password"></label>
+                <label>
+                  Email
+                  <input name="email" type="email" required autocomplete="email" placeholder="you@venturelift.local">
+                  <span class="field-feedback" id="loginEmailFeedback"></span>
+                </label>
+                <label>
+                  Password
+                  <input name="password" type="password" required autocomplete="current-password" placeholder="Enter password">
+                  <span class="field-feedback" id="loginPasswordFeedback"></span>
+                </label>
                 <button class="primary" type="submit">Login</button>
                 <p id="loginStatus" class="status"></p>
               </form>
 
               <form id="registerForm" class="auth-form">
                 <h2>Create account</h2>
-                <label>Name<input name="name" required autocomplete="name" placeholder="Your name"></label>
-                <label>Email<input name="email" type="email" required autocomplete="email" placeholder="you@example.com"></label>
-                <label>Password<input name="password" type="password" required autocomplete="new-password" placeholder="At least 6 characters"></label>
+                <label>
+                  Name
+                  <input name="name" required autocomplete="name" placeholder="Your name">
+                  <span class="field-feedback" id="registerNameFeedback"></span>
+                </label>
+                <label>
+                  Email
+                  <input name="email" type="email" required autocomplete="email" placeholder="you@example.com">
+                  <span class="field-feedback" id="registerEmailFeedback"></span>
+                </label>
+                <label>
+                  Password
+                  <input name="password" type="password" required autocomplete="new-password" placeholder="At least 6 characters">
+                  <span class="field-feedback" id="registerPasswordFeedback"></span>
+                </label>
                 <label>Role
                   <select name="role">
                     <option value="founder">Founder</option>
                     <option value="mentor">Mentor</option>
                   </select>
                 </label>
-                <label>Expertise or focus<input name="expertise" placeholder="AI, healthtech, fundraising, product"></label>
+                <label>
+                  Expertise or focus
+                  <input name="expertise" placeholder="AI, healthtech, fundraising, product">
+                  <span class="field-feedback" id="registerExpertiseFeedback"></span>
+                </label>
                 <button class="primary" type="submit">Create account</button>
                 <p id="registerStatus" class="status"></p>
               </form>

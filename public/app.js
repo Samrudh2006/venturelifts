@@ -28,6 +28,121 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function isEmailValid(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || "").trim());
+}
+
+function isNameValid(name) {
+  return /^[A-Za-z][A-Za-z0-9 '\-\.]*$/.test(String(name || "").trim());
+}
+
+function passwordStrength(password) {
+  const value = String(password || "").trim();
+  let score = 0;
+  if (value.length >= 6) score += 20;
+  if (value.length >= 10) score += 15;
+  if (/[a-z]/.test(value)) score += 20;
+  if (/[A-Z]/.test(value)) score += 20;
+  if (/[0-9]/.test(value)) score += 15;
+  if (/[^A-Za-z0-9]/.test(value)) score += 10;
+  score = Math.min(100, score);
+  if (!value) return { score: 0, label: "" };
+  if (score >= 75) return { score, label: "Strong" };
+  if (score >= 45) return { score, label: "Medium" };
+  return { score, label: "Weak" };
+}
+
+function setFieldFeedback(elementId, message, level = "error") {
+  const element = $(`#${elementId}`);
+  if (!element) return;
+  element.textContent = message;
+  element.classList.remove("strong", "medium", "weak", "error");
+  if (level) element.classList.add(level);
+}
+
+function clearFieldFeedback(elementId) {
+  const element = $(`#${elementId}`);
+  if (!element) return;
+  element.textContent = "";
+  element.classList.remove("strong", "medium", "weak", "error");
+}
+
+function updatePasswordFeedback(password) {
+  const feedbackId = "registerPasswordFeedback";
+  const feedback = $(`#${feedbackId}`);
+  if (!feedback) return;
+  if (!password) {
+    setFieldFeedback(feedbackId, "Password should be at least 6 characters.", "weak");
+    return;
+  }
+  const strength = passwordStrength(password);
+  setFieldFeedback(feedbackId, `${strength.label} password strength`, strength.label.toLowerCase());
+}
+
+function validateLoginForm(form) {
+  clearFieldFeedback("loginEmailFeedback");
+  clearFieldFeedback("loginPasswordFeedback");
+  let valid = true;
+  const email = String(form.email.value || "").trim();
+  const password = String(form.password.value || "");
+
+  if (!email) {
+    setFieldFeedback("loginEmailFeedback", "Email is required.", "error");
+    valid = false;
+  } else if (!isEmailValid(email)) {
+    setFieldFeedback("loginEmailFeedback", "Enter a valid email address.", "error");
+    valid = false;
+  }
+
+  if (!password) {
+    setFieldFeedback("loginPasswordFeedback", "Password is required.", "error");
+    valid = false;
+  } else if (password.length < 6) {
+    setFieldFeedback("loginPasswordFeedback", "Password must be at least 6 characters.", "error");
+    valid = false;
+  }
+
+  return valid;
+}
+
+function validateRegisterForm(form) {
+  clearFieldFeedback("registerNameFeedback");
+  clearFieldFeedback("registerEmailFeedback");
+  clearFieldFeedback("registerPasswordFeedback");
+  let valid = true;
+  const name = String(form.name.value || "").trim();
+  const email = String(form.email.value || "").trim();
+  const password = String(form.password.value || "");
+
+  if (!name) {
+    setFieldFeedback("registerNameFeedback", "Name is required.", "error");
+    valid = false;
+  } else if (!isNameValid(name)) {
+    setFieldFeedback("registerNameFeedback", "Name must start with a letter and not begin with a number.", "error");
+    valid = false;
+  }
+
+  if (!email) {
+    setFieldFeedback("registerEmailFeedback", "Email is required.", "error");
+    valid = false;
+  } else if (!isEmailValid(email)) {
+    setFieldFeedback("registerEmailFeedback", "Enter a valid email address.", "error");
+    valid = false;
+  }
+
+  if (!password) {
+    setFieldFeedback("registerPasswordFeedback", "Password is required.", "error");
+    valid = false;
+  } else if (password.length < 6) {
+    setFieldFeedback("registerPasswordFeedback", "Password must be at least 6 characters.", "weak");
+    valid = false;
+  } else {
+    updatePasswordFeedback(password);
+  }
+
+  return valid;
+}
+
 function listItems(items) {
   if (!Array.isArray(items)) return "";
   return `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
@@ -532,7 +647,12 @@ $$(".auth-tab").forEach((tab) => tab.addEventListener("click", () => switchAuth(
 
 $("#loginForm").addEventListener("submit", async (event) => {
   event.preventDefault();
-  const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
+  const form = event.currentTarget;
+  if (!validateLoginForm(form)) {
+    $("#loginStatus").textContent = "Please fix the highlighted fields.";
+    return;
+  }
+  const payload = Object.fromEntries(new FormData(form).entries());
   $("#loginStatus").textContent = "Logging in...";
   try {
     await login(payload.email, payload.password);
@@ -544,6 +664,10 @@ $("#loginForm").addEventListener("submit", async (event) => {
 $("#registerForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   const form = event.currentTarget;
+  if (!validateRegisterForm(form)) {
+    $("#registerStatus").textContent = "Please fix the highlighted fields.";
+    return;
+  }
   const payload = Object.fromEntries(new FormData(form).entries());
   $("#registerStatus").textContent = "Creating account...";
   try {
@@ -559,6 +683,62 @@ $("#registerForm").addEventListener("submit", async (event) => {
     $("#registerStatus").textContent = error.message;
   }
 });
+
+const registerNameInput = $("#registerForm input[name='name']");
+const registerEmailInput = $("#registerForm input[name='email']");
+const registerPasswordInput = $("#registerForm input[name='password']");
+const loginEmailInput = $("#loginForm input[name='email']");
+const loginPasswordInput = $("#loginForm input[name='password']");
+
+if (registerNameInput) {
+  registerNameInput.addEventListener("blur", (event) => {
+    const value = event.target.value;
+    if (value && !isNameValid(value)) {
+      setFieldFeedback("registerNameFeedback", "Name must start with a letter and not begin with a number.", "error");
+    } else {
+      clearFieldFeedback("registerNameFeedback");
+    }
+  });
+}
+
+if (registerEmailInput) {
+  registerEmailInput.addEventListener("blur", (event) => {
+    const value = event.target.value;
+    if (value && !isEmailValid(value)) {
+      setFieldFeedback("registerEmailFeedback", "Enter a valid email address.", "error");
+    } else {
+      clearFieldFeedback("registerEmailFeedback");
+    }
+  });
+}
+
+if (registerPasswordInput) {
+  registerPasswordInput.addEventListener("input", (event) => {
+    updatePasswordFeedback(event.target.value);
+  });
+}
+
+if (loginEmailInput) {
+  loginEmailInput.addEventListener("blur", (event) => {
+    const value = event.target.value;
+    if (value && !isEmailValid(value)) {
+      setFieldFeedback("loginEmailFeedback", "Enter a valid email address.", "error");
+    } else {
+      clearFieldFeedback("loginEmailFeedback");
+    }
+  });
+}
+
+if (loginPasswordInput) {
+  loginPasswordInput.addEventListener("blur", (event) => {
+    const value = event.target.value;
+    if (value && value.length < 6) {
+      setFieldFeedback("loginPasswordFeedback", "Password must be at least 6 characters.", "error");
+    } else {
+      clearFieldFeedback("loginPasswordFeedback");
+    }
+  });
+}
 
 $("#ventureForm").addEventListener("submit", saveVenture);
 $("#refreshBtn").addEventListener("click", loadVentures);

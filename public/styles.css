@@ -485,6 +485,27 @@ body {
   font-size: 13px;
 }
 
+.field-feedback {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  min-height: 18px;
+  color: #ff8a5c;
+  line-height: 1.2;
+}
+
+.field-feedback.strong {
+  color: #8eff92;
+}
+
+.field-feedback.medium {
+  color: #ffd66d;
+}
+
+.field-feedback.weak {
+  color: #ff8a5c;
+}
+
 /* ---- Hero info card ---- */
 .hero-info-card {
   position: absolute;
