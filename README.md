@@ -11,6 +11,21 @@ A dependency-free full-stack prototype for an entrepreneurial support and innova
 - NLP-style pitch and market signal analyzer
 - Local fallback analysis when no API key is configured
 
+## Tests
+
+```powershell
+npm install
+npm test
+python -m pip install -r requirements.txt
+npm run test:python
+```
+
+Or run everything:
+
+```powershell
+npm run test:all
+```
+
 ## Run
 
 Install dependencies first:
@@ -68,7 +83,7 @@ A new API route is available to run inference using the saved TensorFlow model:
 - `POST /api/cnn-predict`
 - JSON body: `{ "image_base64": "..." }`
 
-The route returns CIFAR-10 class probabilities and the predicted label.
+The route returns CIFAR-10 class probabilities and the predicted label. You can also upload an image from the **AI Validation** tab in the web UI.
 
 ## Optional Supabase replication
 
@@ -80,7 +95,9 @@ $env:SUPABASE_KEY="your-supabase-key"
 npm start
 ```
 
-The server will continue to use the local SQLite database for primary storage while optionally sending copies of new users, ventures, and AI reports to your Supabase project.
+Run `supabase-setup.sql` in your Supabase SQL Editor first so tables match the app schema.
+
+The server will continue to use the local SQLite database for primary storage while optionally sending copies of new users, ventures, and AI reports to your Supabase project. Use the **service role** key for `SUPABASE_KEY` so the Node server can read and write all tables.
 
 ## Deploy to Vercel
 

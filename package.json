@@ -5,7 +5,10 @@
   "type": "module",
   "main": "server.mjs",
   "scripts": {
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "test": "node --test tests/test_backend.mjs",
+    "test:python": "python -m pytest tests/ -v",
+    "test:all": "npm test && npm run test:python"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.0.0"

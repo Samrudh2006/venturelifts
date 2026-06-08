@@ -51,7 +51,7 @@ def main():
     model = tf.keras.models.load_model(str(args.model_path))
     image_tensor = load_image(image_base64)
 
-    predictions = model.predict(image_tensor)
+    predictions = model.predict(image_tensor, verbose=0)
     probabilities = predictions[0].tolist()
     predicted_index = int(tf.math.argmax(predictions[0]).numpy())
     predicted_label = CIFAR10_LABELS[predicted_index]
