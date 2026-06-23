@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { routeApi } from "./lib/backend.mjs";
+import { routeApi, initBackend } from "./lib/backend_v2.mjs";
 
 const ROOT = fileURLToPath(new URL(".", import.meta.url));
 const PUBLIC = ROOT;
@@ -33,18 +33,24 @@ async function routeStatic(response, pathname) {
   response.end(body);
 }
 
-const server = createServer(async (request, response) => {
-  const url = new URL(request.url, `http://${request.headers.host}`);
-  try {
-    if (url.pathname.startsWith("/api/") && (await routeApi(request, response, url))) return;
-    await routeStatic(response, url.pathname);
-  } catch (error) {
-    response.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
-    response.end(JSON.stringify({ error: error.message }));
-  }
-});
+async function startServer() {
+  await initBackend();
 
-server.listen(PORT, "127.0.0.1", () => {
-  const { port } = server.address();
-  console.log(`Venture platform running at http://127.0.0.1:${port}`);
-});
+  const server = createServer(async (request, response) => {
+    const url = new URL(request.url, `http://${request.headers.host}`);
+    try {
+      if (url.pathname.startsWith("/api/") && (await routeApi(request, response, url))) return;
+      await routeStatic(response, url.pathname);
+    } catch (error) {
+      response.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
+      response.end(JSON.stringify({ error: error.message }));
+    }
+  });
+
+  server.listen(PORT, "127.0.0.1", () => {
+    const { port } = server.address();
+    console.log(`Venture platform running at http://127.0.0.1:${port}`);
+  });
+}
+
+startServer();
