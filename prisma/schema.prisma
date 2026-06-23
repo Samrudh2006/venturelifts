@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum UserRole {
+  founder
+  mentor
+  admin
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  role          UserRole
+  expertise     String    @default("")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  ventures      Venture[]
+  aiReports     AiReport[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model Venture {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  name        String
+  founder     String
+  sector      String
+  stage       String
+  problem     String
+  solution    String
+  customer    String
+  traction    String
+  goals       String
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  aiReports   AiReport[]
+
+  @@index([userId])
+  @@index([stage])
+  @@index([sector])
+  @@index([name])
+  @@map("ventures")
+}
+
+model AiReport {
+  id          Int       @id @default(autoincrement())
+  ventureId   Int?      @map("venture_id")
+  userId      Int?      @map("user_id")
+  reportType  String    @map("report_type")
+  payload     Json
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  venture     Venture?  @relation(fields: [ventureId], references: [id], onDelete: SetNull)
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([ventureId])
+  @@index([userId])
+  @@index([reportType])
+  @@map("ai_reports")
+}
