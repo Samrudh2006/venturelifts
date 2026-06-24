@@ -6,6 +6,7 @@ import rateLimit from "@fastify/rate-limit";
 import fastifyCookie from "@fastify/cookie";
 import { connectDatabase, disconnectDatabase } from "./lib/prisma.js";
 import logger from "./lib/logger.js";
+import { seedDemoUsers } from "./lib/seed.js";
 import authPlugin from "./plugins/auth.js";
 import { initSentry, setupSentryErrorHandler, captureError } from "./lib/sentry.js";
 import healthRoutes from "./routes/health.js";
@@ -64,6 +65,7 @@ export async function buildServer() {
 
   initSentry();
   setupSentryErrorHandler(fastify);
+  await seedDemoUsers();
 
   await fastify.register(authPlugin);
 

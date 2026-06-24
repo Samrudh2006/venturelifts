@@ -72,9 +72,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer className="relative border-t border-white/10 bg-black/20 py-8 text-center text-xs text-gray-500">
-        <div className="mx-auto mb-4 flex max-w-max justify-center"><Logo markClassName="h-8 w-8" wordmarkClassName="text-xs" /></div>
-        VentureLift &copy; {new Date().getFullYear()} &mdash; AI-Powered Venture Intelligence Platform
+
       </footer>
     </div>
   );
