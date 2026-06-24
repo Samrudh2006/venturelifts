@@ -2,8 +2,10 @@ import crypto from "node:crypto";
 import jwt from "jsonwebtoken";
 import prisma from "./prisma.js";
 import logger from "./logger.js";
+import { isEmailDeliveryConfigured, sendPasswordResetEmail, sendVerificationEmail } from "./email.js";
 
 const JWT_SECRET = () => process.env.JWT_SECRET || "venturelift-local-dev-secret-change-in-production";
+const REQUIRE_EMAIL_VERIFICATION = () => process.env.EMAIL_VERIFICATION_REQUIRED === "true" || (process.env.NODE_ENV === "production" && process.env.EMAIL_VERIFICATION_REQUIRED !== "false");
 
 export class AuthService {
   generateToken(length = 32) {
@@ -56,8 +58,14 @@ export class AuthService {
       data: { userId: user.id, token: verificationToken, expiresAt },
     });
 
-    logger.info({ email: normalizedEmail, verificationToken }, "User created - verification token");
-    return user;
+    if (REQUIRE_EMAIL_VERIFICATION()) {
+      await sendVerificationEmail(normalizedEmail, verificationToken);
+      logger.info({ email: normalizedEmail, emailDeliveryConfigured: isEmailDeliveryConfigured() }, "User created - verification email queued");
+    } else {
+      await prisma.user.update({ where: { id: user.id }, data: { emailVerified: true, emailVerifiedAt: new Date() } });
+      logger.info({ email: normalizedEmail }, "User created - email auto-verified for non-production login");
+    }
+    return prisma.user.findUniqueOrThrow({ where: { id: user.id } });
   }
 
   async verifyEmail(token: string) {
@@ -84,7 +92,8 @@ export class AuthService {
     await prisma.passwordResetToken.updateMany({ where: { userId: user.id, usedAt: null }, data: { usedAt: new Date() } });
     await prisma.passwordResetToken.create({ data: { userId: user.id, token: resetToken, expiresAt } });
 
-    logger.info({ email: normalizedEmail, resetToken }, "Password reset requested");
+    await sendPasswordResetEmail(normalizedEmail, resetToken);
+    logger.info({ email: normalizedEmail, emailDeliveryConfigured: isEmailDeliveryConfigured() }, "Password reset requested");
     return { message: "If the email exists, a reset link has been sent" };
   }
 
