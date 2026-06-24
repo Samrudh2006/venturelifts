@@ -7,6 +7,7 @@ import fastifyCookie from "@fastify/cookie";
 import { connectDatabase, disconnectDatabase } from "./lib/prisma.js";
 import logger from "./lib/logger.js";
 import authPlugin from "./plugins/auth.js";
+import { initSentry, setupSentryErrorHandler, captureError } from "./lib/sentry.js";
 import healthRoutes from "./routes/health.js";
 import authRoutes from "./routes/v1/auth.js";
 import ventureRoutes from "./routes/v1/ventures.js";
@@ -17,6 +18,9 @@ import sessionRoutes from "./routes/v1/sessions.js";
 import twoFactorRoutes from "./routes/v1/twofactor.js";
 import commentRoutes from "./routes/v1/comments.js";
 import reportRoutes from "./routes/v1/reports.js";
+import monitoringRoutes from "./routes/v1/monitoring.js";
+import oauthRoutes from "./routes/v1/oauth.js";
+import billingRoutes from "./routes/v1/billing.js";
 
 export async function buildServer() {
   const fastify = Fastify({
@@ -57,6 +61,9 @@ export async function buildServer() {
     keyGenerator: (request) => request.ip,
     errorResponseBuilder: () => ({ error: "Too many requests, please try again later." }),
   });
+
+  initSentry();
+  setupSentryErrorHandler(fastify);
 
   await fastify.register(authPlugin);
 
@@ -103,6 +110,9 @@ export async function buildServer() {
     await instance.register(twoFactorRoutes, { prefix: "/2fa" });
     await instance.register(commentRoutes, { prefix: "/comments" });
     await instance.register(reportRoutes, { prefix: "/reports" });
+    await instance.register(monitoringRoutes, { prefix: "/monitoring" });
+    await instance.register(oauthRoutes, { prefix: "/oauth" });
+    await instance.register(billingRoutes, { prefix: "/billing" });
   }, { prefix: "/api/v1" });
 
   return fastify;
@@ -136,6 +146,7 @@ async function start() {
     logger.info({ port }, "VentureLift Fastify server started");
     logger.info({ endpoints: ["/health", "/ready", "/live", "/api/v1"] }, "Available endpoints");
   } catch (error) {
+    captureError(error as Error, { context: "server start" });
     logger.error({ err: error }, "Failed to start server");
     process.exit(1);
   }

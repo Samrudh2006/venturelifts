@@ -10,6 +10,7 @@ import Search from "./pages/Search";
 import Admin from "./pages/Admin";
 import Sessions from "./pages/Sessions";
 import TwoFactor from "./pages/TwoFactor";
+import Billing from "./pages/Billing";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import LoadingScreen from "./components/LoadingScreen";
@@ -45,6 +46,7 @@ function AppContent() {
               <Route path="ai" element={<AiTools />} />
               <Route path="search" element={<Search />} />
               <Route path="sessions" element={<Sessions />} />
+              <Route path="billing" element={<Billing />} />
               <Route path="2fa" element={<ProtectedRoute roles={["admin"]}><TwoFactor /></ProtectedRoute>} />
               <Route path="admin" element={<ProtectedRoute roles={["admin"]}><Admin /></ProtectedRoute>} />
             </>

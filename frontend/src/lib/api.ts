@@ -81,4 +81,12 @@ export const api = {
   reports: {
     export: (type: string) => request<{ url: string; report?: any }>(`/reports/export?type=${type}`),
   },
+  monitoring: {
+    system: () => request<{ uptime: number; version: string; node: string; platform: string; memory: any; cpu: any }>("/monitoring/system"),
+    logs: () => request<{ logs: Array<{ timestamp: string; level: string; msg: string }> }>("/monitoring/logs"),
+  },
+  billing: {
+    plans: () => request<{ plans: any[] }>("/billing/plans"),
+    createCheckout: () => request<{ url: string }>("/billing/create-checkout", { method: "POST" }),
+  },
 };

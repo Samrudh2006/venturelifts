@@ -56,8 +56,8 @@ export default function Admin() {
         <div className="mb-4 rounded-lg border border-gray-700 bg-gray-800/50 px-4 py-2 text-sm text-amber-400">{statusMsg}</div>
       )}
 
-      <div className="mb-6 flex gap-2">
-        {["users", "ventures", "analytics"].map(tab => (
+      <div className="mb-6 flex flex-wrap gap-2">
+        {["users", "ventures", "analytics", "monitoring"].map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             className={`rounded-lg px-4 py-2 text-sm font-bold capitalize transition ${
               activeTab === tab ? "bg-orange-500 text-white" : "border border-gray-700 text-gray-400 hover:border-orange-500 hover:text-orange-500"
@@ -214,6 +214,57 @@ export default function Admin() {
           )}
         </div>
       )}
+
+      {activeTab === "monitoring" && (
+        <MonitoringTab />
+      )}
+    </div>
+  );
+}
+
+function MonitoringTab() {
+  const { data: system, isLoading: sysLoading } = useQuery({ queryKey: ["monitoring-system"], queryFn: () => api.monitoring.system() });
+  const { data: logsData, isLoading: logsLoading } = useQuery({ queryKey: ["monitoring-logs"], queryFn: () => api.monitoring.logs(), refetchInterval: 10000 });
+
+  if (sysLoading || logsLoading) return <div className="animate-pulse space-y-3">{Array(3).fill(0).map((_, i) => <div key={i} className="h-20 rounded-xl bg-gray-800" />)}</div>;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4 text-center">
+          <p className="text-2xl font-black text-orange-500">{system?.uptime ? `${Math.floor(system.uptime / 60)}m` : "--"}</p>
+          <p className="text-xs font-bold uppercase text-gray-500">Uptime</p>
+        </div>
+        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4 text-center">
+          <p className="text-2xl font-black text-orange-500">{system?.memory?.rss || "--"}</p>
+          <p className="text-xs font-bold uppercase text-gray-500">Memory</p>
+        </div>
+        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4 text-center">
+          <p className="text-2xl font-black text-orange-500">{system?.node || "--"}</p>
+          <p className="text-xs font-bold uppercase text-gray-500">Node</p>
+        </div>
+        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4 text-center">
+          <p className="text-2xl font-black text-orange-500">{system?.platform || "--"}</p>
+          <p className="text-xs font-bold uppercase text-gray-500">Platform</p>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-5">
+        <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-white">Recent Logs (auto-refresh 10s)</h3>
+        <div className="max-h-80 space-y-1 overflow-y-auto font-mono text-xs">
+          {(logsData?.logs || []).length === 0 ? (
+            <p className="text-gray-500">No logs yet. Activity will appear here.</p>
+          ) : (
+            logsData?.logs.slice().reverse().map((log, i) => (
+              <div key={i} className="flex gap-2 rounded px-2 py-1 hover:bg-gray-800/50">
+                <span className="shrink-0 text-gray-600">{new Date(log.timestamp).toLocaleTimeString()}</span>
+                <span className={`shrink-0 font-bold uppercase ${log.level === "info" ? "text-green-400" : "text-orange-400"}`}>{log.level}</span>
+                <span className="text-gray-400">{log.msg}</span>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 }

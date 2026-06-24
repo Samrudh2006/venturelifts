@@ -7,6 +7,7 @@ const navItems = [
   { path: "/ai", label: "AI Tools", roles: ["founder", "mentor", "admin"] },
   { path: "/search", label: "Search", roles: ["founder", "mentor", "admin"] },
   { path: "/sessions", label: "Sessions", roles: ["founder", "mentor", "admin"] },
+  { path: "/billing", label: "Billing", roles: ["founder", "mentor", "admin"] },
   { path: "/2fa", label: "2FA", roles: ["admin"] },
   { path: "/admin", label: "Admin", roles: ["admin"] },
 ];
