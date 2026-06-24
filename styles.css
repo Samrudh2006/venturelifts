@@ -1397,3 +1397,87 @@ textarea:focus-visible {
     flex-direction: column;
   }
 }
+
+/* VentureLift brand refresh: CSS-only art inspired by supplied references, no binary assets. */
+.hero-slider {
+  background:
+    radial-gradient(circle at 74% 20%, rgba(255, 111, 0, 0.2), transparent 24rem),
+    radial-gradient(circle at 55% 36%, rgba(37, 99, 235, 0.14), transparent 28rem),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0.98)),
+    repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.045) 0 1px, transparent 1px 90px);
+}
+
+.image-1,
+.image-2,
+.image-3 {
+  background-image: none;
+}
+
+.image-1 {
+  opacity: 0.95;
+  background:
+    radial-gradient(circle at 68% 31%, rgba(255, 111, 0, 0.35), transparent 5rem),
+    linear-gradient(116deg, transparent 0 58%, rgba(255, 106, 0, 0.72) 58.5% 60%, transparent 61%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 52px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 52px);
+}
+
+.image-1::before {
+  content: "";
+  position: absolute;
+  right: 14%;
+  top: 15%;
+  width: 34%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(148, 163, 184, 0.18) 0 1px, transparent 1px 10px);
+}
+
+.image-1::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 30%;
+  background: repeating-radial-gradient(ellipse at center, rgba(255, 102, 0, 0.32) 0 1px, transparent 1px 12px);
+  clip-path: polygon(0 58%, 18% 42%, 36% 64%, 55% 40%, 78% 52%, 100% 26%, 100% 100%, 0 100%);
+}
+
+.nav-logo {
+  position: relative;
+  overflow: hidden;
+  background: #050914;
+  border: 2px solid #ff7a00;
+  box-shadow: 0 0 22px rgba(255, 106, 0, 0.28);
+}
+
+.nav-logo::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 12px;
+  width: 16px;
+  height: 22px;
+  border-left: 7px solid #ff6a00;
+  border-bottom: 7px solid #ff6a00;
+  transform: rotate(-30deg);
+  border-radius: 0 0 0 6px;
+}
+
+.nav-logo::after {
+  content: "";
+  position: absolute;
+  right: 7px;
+  top: 7px;
+  width: 10px;
+  height: 24px;
+  background: linear-gradient(#fff, #a7adb7);
+  border: 2px solid #050914;
+  border-radius: 9px 9px 3px 3px;
+  transform: rotate(34deg);
+}
+
+.nav-logo-text span,
+.topbar-brand span {
+  color: #ff5a00;
+}

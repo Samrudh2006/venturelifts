@@ -1,5 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+import Logo from "./Logo";
 
 const navItems = [
   { path: "/dashboard", label: "Dashboard", roles: ["founder", "mentor", "admin"] },
@@ -23,15 +24,12 @@ export default function Layout() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100">
+    <div className="min-h-screen bg-gray-950 text-gray-100 venturelift-platform-bg">
       <header className="sticky top-0 z-50 border-b border-gray-800 bg-gray-950/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-6">
             <Link to="/dashboard" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-red-600 font-black text-white">
-                VL
-              </div>
-              <span className="hidden text-sm font-bold tracking-widest font-heading sm:block">VENTURELIFT</span>
+              <Logo markClassName="h-9 w-9" wordmarkClassName="hidden text-sm sm:block" />
             </Link>
             <nav className="flex gap-1">
               {navItems
