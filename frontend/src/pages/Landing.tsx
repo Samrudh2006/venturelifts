@@ -73,55 +73,6 @@ export default function Landing() {
       </section>
 
 
-      <section className="relative mx-auto max-w-7xl px-4 pb-20">
-        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="rounded-3xl border border-white/10 bg-black/25 p-8 backdrop-blur">
-            <p className="text-xs font-bold uppercase tracking-[0.26em] text-orange-300">Built for serious founders</p>
-            <h2 className="mt-4 text-3xl font-black text-white font-heading">Everything after the idea, organized into one operating system.</h2>
-            <p className="mt-4 text-sm leading-7 text-gray-400">Capture assumptions, validate demand, turn feedback into experiments, and keep mentors aligned around the same venture evidence. VentureLift helps founders move from scattered notes to measurable traction.</p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              ["Validation depth", "Problem clarity, target customer, differentiation, market pull, and execution risk scoring."],
-              ["Mentor signal", "Find domain experts and keep advice connected to the venture profile and latest milestone."],
-              ["Investor readiness", "Generate cleaner narratives, proof points, reports, and next-step roadmaps for stakeholder updates."],
-              ["Growth rhythm", "Track weekly experiments, learning velocity, traction evidence, and launch confidence."],
-            ].map(([title, copy]) => (
-              <article key={title} className="rounded-2xl border border-white/10 bg-gray-900/45 p-5">
-                <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-white">{title}</h3>
-                <p className="mt-3 text-sm leading-6 text-gray-400">{copy}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="relative mx-auto max-w-7xl px-4 pb-20">
-        <div className="rounded-3xl border border-orange-500/20 bg-gradient-to-r from-orange-500/15 via-gray-900/80 to-blue-500/10 p-8 backdrop-blur lg:flex lg:items-center lg:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.26em] text-orange-300">Founder workflow</p>
-            <h2 className="mt-3 text-3xl font-black text-white font-heading">Validate the right thing before you build the big thing.</h2>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-gray-300">Use VentureLift to document the idea, pressure-test the market, compare mentor feedback, unlock a roadmap, and show progress with evidence instead of assumptions.</p>
-          </div>
-          <Link to="/login?register=1" className="mt-6 inline-flex rounded-xl bg-white px-6 py-3 text-sm font-black uppercase tracking-wide text-gray-950 transition hover:bg-orange-100 lg:mt-0">Create founder account</Link>
-        </div>
-      </section>
-      <footer className="relative border-t border-white/10 bg-black/30 px-4 py-10 text-xs text-gray-500">
-        <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
-          <div>
-            <Logo markClassName="h-10 w-10" wordmarkClassName="text-sm" showTagline />
-            <p className="mt-4 max-w-md leading-6">AI-powered venture intelligence for founders who want clearer validation, better mentor connections, and stronger startup decisions.</p>
-          </div>
-          <div>
-            <h3 className="font-bold uppercase tracking-[0.2em] text-gray-300">Platform</h3>
-            <p className="mt-3 leading-6">AI validation<br />Mentor matching<br />Venture builder<br />Reports and roadmaps</p>
-          </div>
-          <div>
-            <h3 className="font-bold uppercase tracking-[0.2em] text-gray-300">Access</h3>
-            <p className="mt-3 leading-6">Founder signup<br />Mentor profiles<br />Invite-only admin<br />Google login ready</p>
-          </div>
-        </div>
-        <div className="mx-auto mt-8 max-w-7xl border-t border-white/10 pt-6 text-center">VentureLift &copy; {new Date().getFullYear()} &mdash; Validate • Build • Connect • Grow</div>
       </footer>
     </div>
   );
