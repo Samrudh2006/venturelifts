@@ -17,7 +17,7 @@ export default function VentureBuilder() {
 
   const mutation = useMutation({
     mutationFn: (data: any) => api.ventures.create(data),
-    onSuccess: (response: any) => {
+    onSuccess: () => {
       setStatus("Venture saved to the database.");
       setForm({ name: "", founder: "", sector: "", stage: "Idea", problem: "", solution: "", customer: "", traction: "", goals: "" });
       setSimilarVenture(null);
@@ -115,6 +115,12 @@ export default function VentureBuilder() {
             {mutation.isPending ? "Saving..." : "Save Venture"}
           </button>
           {status && <p className="text-center text-sm font-semibold text-amber-400">{status}</p>}
+          {similarVenture && (
+            <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-100">
+              <p className="font-bold">Similar venture found: {similarVenture.name}</p>
+              <p className="mt-1 text-amber-200/80">Review the existing profile before creating a duplicate.</p>
+            </div>
+          )}
         </form>
 
         {ventures.length > 0 && (
