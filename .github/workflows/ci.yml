@@ -8,6 +8,8 @@ on:
 
 env:
   NODE_VERSION: "24"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   lint-and-typecheck:
@@ -56,6 +58,22 @@ jobs:
           DATABASE_URL: postgresql://venturelift:venturelift@localhost:5432/venturelift_test?schema=public
           JWT_SECRET: test-secret-for-ci-min-32-chars!!
 
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - run: npx tsc --noEmit
+        working-directory: frontend
+      - run: npx vitest run
+        working-directory: frontend
+
   security-audit:
     runs-on: ubuntu-latest
     steps:
@@ -78,18 +96,35 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npx playwright install chromium
+      - name: Start server
+        run: |
+          DATABASE_URL=postgresql://venturelift:venturelift@localhost:5432/venturelift_test?schema=public \
+          JWT_SECRET=test-secret-for-ci-min-32-chars!! \
+          node --import tsx src/server.ts &
+          sleep 5
       - run: npm run test:e2e
         env:
-          JWT_SECRET: test-secret-for-ci-min-32-chars!!
+          BASE_URL: http://127.0.0.1:8000
 
   deploy:
     if: github.ref == 'refs/heads/main'
-    needs: [lint-and-typecheck, test, security-audit, e2e-tests]
+    needs: [lint-and-typecheck, test, frontend-tests, security-audit, e2e-tests]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push Docker image
-        run: |
-          docker build -t venturelift/app:latest -f docker/Dockerfile .
-      - name: Deploy
-        run: echo "Deployment step - configure your cloud provider here"
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}

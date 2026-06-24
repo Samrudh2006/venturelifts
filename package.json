@@ -9,6 +9,11 @@
     "dev": "node --import tsx src/server.ts",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "playwright test tests/e2e",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint src",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "seed": "node lib/backend_v2.mjs"

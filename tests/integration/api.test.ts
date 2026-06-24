@@ -7,7 +7,8 @@ async function inject(method: string, url: string, payload?: any, token?: string
   const server = await buildServer();
   await server.ready();
 
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const headers: Record<string, string> = {};
+  if (payload) headers["Content-Type"] = "application/json";
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
   const response = await server.inject({ method: method as any, url, headers, payload: payload ? JSON.stringify(payload) : undefined });
@@ -76,5 +77,73 @@ describe("API Integration Tests", () => {
     expect(list.status).toBe(200);
     expect(Array.isArray(list.data.comments)).toBe(true);
     expect(list.data.comments.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("admin login works", async () => {
+    const { status, data } = await inject("POST", "/api/v1/login", { email: "admin@venturelift.local", password: "Admin@123" });
+    expect(status).toBe(200);
+    expect(data.accessToken).toBeTruthy();
+    expect(data.user.role).toBe("admin");
+  });
+
+  it("admin can list all users", async () => {
+    const login = await inject("POST", "/api/v1/login", { email: "admin@venturelift.local", password: "Admin@123" });
+    const { status, data } = await inject("GET", "/api/v1/users", undefined, login.data.accessToken);
+    expect(status).toBe(200);
+    expect(Array.isArray(data.users)).toBe(true);
+    expect(data.users.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("admin can view analytics", async () => {
+    const login = await inject("POST", "/api/v1/login", { email: "admin@venturelift.local", password: "Admin@123" });
+    const { status, data } = await inject("GET", "/api/v1/users/analytics", undefined, login.data.accessToken);
+    expect(status).toBe(200);
+    expect(typeof data.totalUsers).toBe("number");
+    expect(typeof data.totalVentures).toBe("number");
+    expect(Array.isArray(data.roleCounts)).toBe(true);
+  });
+
+  it("non-admin cannot list all users", async () => {
+    const login = await inject("POST", "/api/v1/login", { email: "founder@venturelift.local", password: "Founder@123" });
+    const { status } = await inject("GET", "/api/v1/users", undefined, login.data.accessToken);
+    expect(status).toBe(403);
+  });
+
+  it("admin can list all ventures", async () => {
+    const login = await inject("POST", "/api/v1/login", { email: "admin@venturelift.local", password: "Admin@123" });
+    const { status, data } = await inject("GET", "/api/v1/ventures/all", undefined, login.data.accessToken);
+    expect(status).toBe(200);
+    expect(Array.isArray(data.ventures)).toBe(true);
+  });
+
+  it("admin can update a user role", async () => {
+    const login = await inject("POST", "/api/v1/login", { email: "admin@venturelift.local", password: "Admin@123" });
+    const token = login.data.accessToken;
+
+    const users = await inject("GET", "/api/v1/users", undefined, token);
+    const targetUser = users.data.users?.find((u: any) => u.email === "founder@venturelift.local");
+    if (!targetUser) return;
+
+    const { status } = await inject("PUT", `/api/v1/users/${targetUser.id}/role`, { role: "founder" }, token);
+    expect(status).toBe(200);
+  });
+
+  it("comment update and delete works", async () => {
+    const login = await inject("POST", "/api/v1/login", { email: "founder@venturelift.local", password: "Founder@123" });
+    const token = login.data.accessToken;
+
+    const ventures = await inject("GET", "/api/v1/ventures", undefined, token);
+    const firstVenture = ventures.data.ventures?.[0];
+    if (!firstVenture) return;
+
+    const create = await inject("POST", "/api/v1/comments", { ventureId: firstVenture.id, content: "To be updated" }, token);
+    const commentId = create.data.comment?.id;
+    if (!commentId) return;
+
+    const update = await inject("PUT", `/api/v1/comments/${commentId}`, { content: "Updated content" }, token);
+    expect(update.status).toBe(200);
+
+    const del = await inject("DELETE", `/api/v1/comments/${commentId}`, undefined, token);
+    expect(del.status).toBe(200);
   });
 });

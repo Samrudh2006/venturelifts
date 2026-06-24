@@ -4,5 +4,7 @@ venture_platform.db
 models/
 __pycache__/
 .pytest_cache/
+*.log
+*.err
 
 /lib/generated/prisma

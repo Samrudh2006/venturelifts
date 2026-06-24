@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 
 export default function Login() {
-  const [isRegister, setIsRegister] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [isRegister, setIsRegister] = useState(searchParams.get("register") === "1");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -88,6 +89,7 @@ export default function Login() {
                     className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-800/50 p-3 text-sm text-white outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20">
                     <option value="founder">Founder</option>
                     <option value="mentor">Mentor</option>
+                    <option value="admin">Admin</option>
                   </select>
                 </div>
                 <div>

@@ -11,7 +11,9 @@ import Admin from "./pages/Admin";
 import Sessions from "./pages/Sessions";
 import TwoFactor from "./pages/TwoFactor";
 import Login from "./pages/Login";
+import Landing from "./pages/Landing";
 import LoadingScreen from "./components/LoadingScreen";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30000 } },
@@ -32,19 +34,25 @@ function AppContent() {
   if (isLoading) return <LoadingScreen />;
 
   return (
-    <Routes>
-      <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
-      <Route path="/" element={user ? <Layout /> : <Navigate to="/login" replace />}>
-        <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="ventures" element={<VentureBuilder />} />
-        <Route path="ai" element={<AiTools />} />
-        <Route path="search" element={<Search />} />
-        <Route path="sessions" element={<Sessions />} />
-        <Route path="2fa" element={<ProtectedRoute roles={["admin"]}><TwoFactor /></ProtectedRoute>} />
-        <Route path="admin" element={<ProtectedRoute roles={["admin"]}><Admin /></ProtectedRoute>} />
-      </Route>
-    </Routes>
+    <ErrorBoundary>
+      <Routes>
+        <Route path="/" element={user ? <Layout /> : <Landing />}>
+          {user && (
+            <>
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="ventures" element={<VentureBuilder />} />
+              <Route path="ai" element={<AiTools />} />
+              <Route path="search" element={<Search />} />
+              <Route path="sessions" element={<Sessions />} />
+              <Route path="2fa" element={<ProtectedRoute roles={["admin"]}><TwoFactor /></ProtectedRoute>} />
+              <Route path="admin" element={<ProtectedRoute roles={["admin"]}><Admin /></ProtectedRoute>} />
+            </>
+          )}
+        </Route>
+        <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+      </Routes>
+    </ErrorBoundary>
   );
 }
 
